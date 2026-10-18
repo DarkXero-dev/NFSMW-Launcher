@@ -47,8 +47,9 @@ rm -f "$appdir"/usr/lib/python"$pyver"/lib-dynload/{_tkinter,_curses,_curses_pan
 
 echo "Application files"
 cp -a "$root/main.py" "$root/nfsmw_launcher" "$app_share/"
+[[ -f "$root/VERSION" ]] && cp "$root/VERSION" "$app_share/"
 mkdir -p "$app_share/assets"
-cp -a "$root/assets/launcher.jpg" "$root/assets/settings-banner.png" "$root/assets/style.css" "$app_share/assets/"
+cp -a "$root/assets/launcher.jpg" "$root/assets/darkxero.png" "$root/assets/github.png" "$root/assets/settings-banner.png" "$root/assets/style.css" "$app_share/assets/"
 find "$app_share" -name __pycache__ -type d -prune -exec rm -rf {} +
 
 echo "Shared libraries (probing a live run for dlopen'd ones)"

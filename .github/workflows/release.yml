@@ -19,6 +19,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: archlinux:latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     env:
       GSK_RENDERER: cairo
       GSETTINGS_BACKEND: memory
@@ -32,6 +34,16 @@ jobs:
           binutils squashfs-tools curl git xorg-server-xvfb ttf-dejavu
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Next version
+        id: version
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          version="$(bash packaging/next-version.sh)"
+          echo "$version" > VERSION
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Test
         run: xvfb-run -a python -m pytest -q -p no:cacheprovider
@@ -61,7 +73,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="v1.0.${{ github.run_number }}"
+          tag="v${{ needs.build.outputs.version }}"
           previous="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
           {
             echo "## Changes"

@@ -4,3 +4,4 @@ build/
 *.AppImage
 *.AppImage.tmp
 push.sh
+VERSION

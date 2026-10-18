@@ -7,10 +7,12 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, GLib, Gtk
 
+from .about_window import AboutWindow
 from .config import Config, load_config, save_config
 from .prefs_window import PreferencesWindow
 from .runners import build_launch, find_game_dir, start, validate
 from .settings_window import ASSETS, ReduxSettingsWindow
+from .version import VERSION
 
 
 class LauncherWindow(Adw.ApplicationWindow):
@@ -45,6 +47,9 @@ class LauncherWindow(Adw.ApplicationWindow):
             css_classes=["art-header"], title_widget=Gtk.Box(), valign=Gtk.Align.START
         )
         header.pack_end(cog)
+        about = Gtk.Button(icon_name="help-about-symbolic", tooltip_text="About")
+        about.connect("clicked", lambda *_: AboutWindow(self, VERSION).present())
+        header.pack_end(about)
 
         launch = Gtk.Button(label="LAUNCH GAME", css_classes=["gold"])
         launch.connect("clicked", self._on_launch)
