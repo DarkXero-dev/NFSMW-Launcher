@@ -48,6 +48,8 @@ rm -f "$appdir"/usr/lib/python"$pyver"/lib-dynload/{_tkinter,_curses,_curses_pan
 echo "Application files"
 cp -a "$root/main.py" "$root/nfsmw_launcher" "$app_share/"
 [[ -f "$root/VERSION" ]] && cp "$root/VERSION" "$app_share/"
+repo="${GITHUB_REPOSITORY:-DarkXero-dev/NFSMW-Launcher}"
+echo "$repo" > "$app_share/REPO"
 mkdir -p "$app_share/assets"
 cp -a "$root/assets/launcher.jpg" "$root/assets/darkxero.png" "$root/assets/github.png" "$root/assets/settings-banner.png" "$root/assets/style.css" "$app_share/assets/"
 find "$app_share" -name __pycache__ -type d -prune -exec rm -rf {} +
@@ -120,7 +122,6 @@ echo "Packaging"
 runtime="$build/runtime-x86_64"
 [[ -f "$runtime" ]] || curl -sSL -o "$runtime" "$runtime_url"
 echo "$runtime_sha256  $runtime" | sha256sum -c --quiet
-repo="${GITHUB_REPOSITORY:-DarkXero-dev/NFSMW-Launcher}"
 update_info="gh-releases-zsync|${repo%/*}|${repo#*/}|latest|$(basename "$output").zsync"
 cp "$runtime" "$build/runtime-with-update-info"
 python3 "$here/embed_update_info.py" "$build/runtime-with-update-info" "$update_info"

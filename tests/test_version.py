@@ -46,3 +46,11 @@ def test_next_version_starts_at_1_0_1_without_tags(tmp_path):
 )
 def test_next_version_increments_the_highest_patch_number(tmp_path, tags, expected):
     assert next_version(tmp_path, *tags) == expected
+
+
+def test_read_repo_returns_trimmed_file_content_or_none(tmp_path):
+    from nfsmw_launcher.version import read_repo
+
+    assert read_repo(tmp_path) is None
+    (tmp_path / "REPO").write_text("DarkXero-dev/NFSMW-Launcher\n")
+    assert read_repo(tmp_path) == "DarkXero-dev/NFSMW-Launcher"

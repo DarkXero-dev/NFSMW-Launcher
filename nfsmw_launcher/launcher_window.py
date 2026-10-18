@@ -1,4 +1,6 @@
 import os
+import subprocess
+import threading
 from pathlib import Path
 
 import gi
@@ -10,9 +12,10 @@ from gi.repository import Adw, GLib, Gtk
 from .about_window import AboutWindow
 from .config import Config, load_config, save_config
 from .prefs_window import PreferencesWindow
-from .runners import build_launch, find_game_dir, start, validate
+from .runners import build_launch, find_game_dir, host_env, start, validate
 from .settings_window import ASSETS, ReduxSettingsWindow
-from .version import VERSION
+from .updater import Update, check_for_update, download, install, relaunch_argv, update_check_enabled
+from .version import REPO, VERSION
 
 
 class LauncherWindow(Adw.ApplicationWindow):
@@ -21,9 +24,12 @@ class LauncherWindow(Adw.ApplicationWindow):
         self._config = load_config()
         self._autodetect_game_dir()
         self._toasts = Adw.ToastOverlay()
+        self._update: Update | None = None
         self._build_ui()
         if validate(self._config):
             GLib.idle_add(self._open_preferences)
+        if update_check_enabled(os.environ, VERSION, REPO):
+            threading.Thread(target=self._check_for_update, daemon=True).start()
 
     def _autodetect_game_dir(self):
         if self._config.game_dir:
@@ -50,6 +56,9 @@ class LauncherWindow(Adw.ApplicationWindow):
         about = Gtk.Button(icon_name="help-about-symbolic", tooltip_text="About")
         about.connect("clicked", lambda *_: AboutWindow(self, VERSION).present())
         header.pack_end(about)
+        self._update_button = Gtk.Button(label="UPDATE & RELAUNCH", css_classes=["gold"], visible=False)
+        self._update_button.connect("clicked", self._on_update_clicked)
+        header.pack_end(self._update_button)
 
         launch = Gtk.Button(label="LAUNCH GAME", css_classes=["gold"])
         launch.connect("clicked", self._on_launch)
@@ -68,6 +77,55 @@ class LauncherWindow(Adw.ApplicationWindow):
         overlay.add_overlay(header)
         self._toasts.set_child(overlay)
         self.set_content(self._toasts)
+
+    def _check_for_update(self):
+        update = check_for_update(REPO, VERSION)
+        if update:
+            GLib.idle_add(self._on_update_found, update)
+
+    def _on_update_found(self, update: Update):
+        self._update = update
+        self._update_button.set_tooltip_text(f"Version {VERSION} to {update.version}")
+        self._update_button.set_visible(True)
+        return False
+
+    def _on_update_clicked(self, button: Gtk.Button):
+        button.set_sensitive(False)
+        button.set_label("DOWNLOADING...")
+        threading.Thread(target=self._run_update, daemon=True).start()
+
+    def _run_update(self):
+        target = Path(os.environ["APPIMAGE"])
+        partial = target.with_name(target.name + ".update")
+        try:
+            download(self._update.url, partial, self._update.sha256, self._show_progress)
+            install(partial, target)
+        except (OSError, ValueError) as error:
+            GLib.idle_add(self._update_failed, str(error))
+            return
+        GLib.idle_add(self._relaunch, target)
+
+    def _show_progress(self, done: int, total: int):
+        label = f"DOWNLOADING {done * 100 // total}%" if total else "DOWNLOADING..."
+        GLib.idle_add(self._update_button.set_label, label)
+
+    def _update_failed(self, reason: str):
+        self._toast(f"Update failed: {reason}")
+        self._update_button.set_label("UPDATE & RELAUNCH")
+        self._update_button.set_sensitive(True)
+        return False
+
+    def _relaunch(self, target: Path):
+        subprocess.Popen(
+            relaunch_argv(os.getpid(), str(target)),
+            env=host_env(os.environ),
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        self.get_application().quit()
+        return False
 
     def _toast(self, message: str):
         self._toasts.add_toast(Adw.Toast(title=message))

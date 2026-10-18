@@ -72,3 +72,15 @@ def test_buttons_open_their_own_urls(monkeypatch):
     for button in [b for b in buttons(content) if labels(b)]:
         button.emit("clicked")
     assert opened == [uri for _, uri in LINKS]
+
+
+def test_update_button_is_hidden_until_an_update_is_found(tmp_path, monkeypatch):
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    from nfsmw_launcher.launcher_window import LauncherWindow
+    from nfsmw_launcher.updater import Update
+
+    window = LauncherWindow(Adw.Application(application_id="org.nfsmw.ReduxLauncherTest"))
+    assert not window._update_button.get_visible()
+    window._on_update_found(Update("1.0.99", "https://example.test/x", None))
+    assert window._update_button.get_visible()
+    assert "1.0.99" in window._update_button.get_tooltip_text()
