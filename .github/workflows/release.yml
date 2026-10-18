@@ -31,7 +31,7 @@ jobs:
           pacman -Syu --noconfirm --needed
           python python-gobject python-pytest gtk4 libadwaita
           adwaita-icon-theme gsettings-desktop-schemas glib2
-          binutils squashfs-tools curl git xorg-server-xvfb ttf-dejavu
+          binutils squashfs-tools zsync curl git xorg-server-xvfb ttf-dejavu
 
       - uses: actions/checkout@v4
         with:
@@ -51,10 +51,15 @@ jobs:
       - name: Build AppImage
         run: xvfb-run -a bash packaging/build-appimage.sh NFSMW-Launcher.AppImage
 
+      - name: Create zsync file for AppImageUpdate
+        run: zsyncmake -u NFSMW-Launcher.AppImage -o NFSMW-Launcher.AppImage.zsync NFSMW-Launcher.AppImage
+
       - uses: actions/upload-artifact@v4
         with:
           name: NFSMW-Launcher
-          path: NFSMW-Launcher.AppImage
+          path: |
+            NFSMW-Launcher.AppImage
+            NFSMW-Launcher.AppImage.zsync
           if-no-files-found: error
 
   release:
@@ -80,7 +85,7 @@ jobs:
             echo
             git log --no-merges --pretty='- %s (%h)' ${previous:+$previous..}HEAD
           } > notes.md
-          gh release create "$tag" NFSMW-Launcher.AppImage \
+          gh release create "$tag" NFSMW-Launcher.AppImage NFSMW-Launcher.AppImage.zsync \
             --title "NFSMW Launcher $tag" \
             --notes-file notes.md \
             --target "$GITHUB_SHA"

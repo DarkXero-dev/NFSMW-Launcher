@@ -120,8 +120,13 @@ echo "Packaging"
 runtime="$build/runtime-x86_64"
 [[ -f "$runtime" ]] || curl -sSL -o "$runtime" "$runtime_url"
 echo "$runtime_sha256  $runtime" | sha256sum -c --quiet
-mksquashfs "$appdir" "$build/app.squashfs" -root-owned -noappend -comp zstd -Xcompression-level 19 -quiet
-cat "$runtime" "$build/app.squashfs" > "$output.tmp"
+repo="${GITHUB_REPOSITORY:-DarkXero-dev/NFSMW-Launcher}"
+update_info="gh-releases-zsync|${repo%/*}|${repo#*/}|latest|$(basename "$output").zsync"
+cp "$runtime" "$build/runtime-with-update-info"
+python3 "$here/embed_update_info.py" "$build/runtime-with-update-info" "$update_info"
+mksquashfs "$appdir" "$build/app.squashfs" -root-owned -noappend -comp zstd -Xcompression-level 19 \
+    -all-time 0 -mkfs-time 0 -quiet
+cat "$build/runtime-with-update-info" "$build/app.squashfs" > "$output.tmp"
 chmod +x "$output.tmp"
 mv -f "$output.tmp" "$output"
 echo "Built $output ($(du -h "$output" | cut -f1))"

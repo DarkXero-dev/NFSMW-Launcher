@@ -17,6 +17,8 @@ One click starts the game, and a settings window edits all nine of the Redux mod
 3. Make it executable (`chmod +x NFSMW-Launcher.AppImage`) and run it.
 4. On first run, click the cog (top right) and choose how to run the game. The game folder is picked up automatically.
 
+To update later, run `appimageupdatetool NFSMW-Launcher.AppImage` (AppImageUpdate, available from the AUR on Arch), or open the AppImage in AppImageUpdate's GUI. It downloads only what changed.
+
 If double-clicking does nothing, run it from a terminal with `--appimage-extract-and-run`.
 
 ## Notes

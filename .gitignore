@@ -3,5 +3,6 @@ __pycache__/
 build/
 *.AppImage
 *.AppImage.tmp
+*.zsync
 push.sh
 VERSION
