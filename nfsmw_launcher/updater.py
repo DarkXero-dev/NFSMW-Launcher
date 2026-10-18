@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import urllib.request
 from dataclasses import dataclass
@@ -58,7 +59,8 @@ def fetch_latest_release(repo: str) -> dict:
 def check_for_update(repo: str, current: str, fetch=fetch_latest_release) -> Update | None:
     try:
         return find_update(fetch(repo), current)
-    except (OSError, ValueError):
+    except (OSError, ValueError) as error:
+        logging.getLogger(__name__).warning("update check failed: %s", error)
         return None
 
 

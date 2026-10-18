@@ -43,7 +43,7 @@ tar -C "$stdlib" \
 mkdir -p "$appdir/usr/lib/python$pyver/site-packages"
 cp -a "$gi_dir" "$appdir/usr/lib/python$pyver/site-packages/gi"
 find "$appdir/usr/lib/python$pyver" -name __pycache__ -type d -prune -exec rm -rf {} +
-rm -f "$appdir"/usr/lib/python"$pyver"/lib-dynload/{_tkinter,_curses,_curses_panel,readline,_gdbm,_dbm,_sqlite3,_ssl,_hashlib}.*
+rm -f "$appdir"/usr/lib/python"$pyver"/lib-dynload/{_tkinter,_curses,_curses_panel,readline,_gdbm,_dbm,_sqlite3}.*
 
 echo "Application files"
 cp -a "$root/main.py" "$root/nfsmw_launcher" "$app_share/"
@@ -117,6 +117,9 @@ ln -s nfsmw-redux-launcher.png "$appdir/.DirIcon"
 
 echo "Bytecode"
 LD_LIBRARY_PATH="$appdir/usr/lib" "$appdir/usr/bin/python3" -sE -m compileall -q "$appdir/usr/lib/python$pyver" "$app_share"
+
+echo "Bundle self-check"
+LD_LIBRARY_PATH="$appdir/usr/lib" "$appdir/usr/bin/python3" -sE -c 'import ssl, hashlib, urllib.request; ssl.create_default_context()'
 
 echo "Packaging"
 runtime="$build/runtime-x86_64"

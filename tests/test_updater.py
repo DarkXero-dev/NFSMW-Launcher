@@ -149,3 +149,12 @@ def test_relaunch_waits_for_the_old_process_then_starts_the_new_file():
 )
 def test_update_check_only_runs_for_released_appimage_builds(environ, version, repo, expected):
     assert updater.update_check_enabled(environ, version, repo) is expected
+
+
+def test_failed_update_check_is_logged_instead_of_silently_swallowed(caplog):
+    def broken(repo):
+        raise OSError("unknown url type: https")
+
+    with caplog.at_level("WARNING"):
+        assert check_for_update("me/app", "1.0.1", fetch=broken) is None
+    assert "unknown url type: https" in caplog.text
