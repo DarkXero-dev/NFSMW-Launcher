@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 60 1600 120" width="1600" height="120">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#070a18"/>
+      <stop offset="0.45" stop-color="#1a2150"/>
+      <stop offset="0.72" stop-color="#7a2f6b"/>
+      <stop offset="0.88" stop-color="#ff7a18"/>
+      <stop offset="1" stop-color="#ffc233"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b1b24"/>
+      <stop offset="1" stop-color="#050508"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff2b0" stop-opacity="0.95"/>
+      <stop offset="0.35" stop-color="#ffb02e" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ff7a18" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fadeLeft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#05060d" stop-opacity="0.85"/>
+      <stop offset="0.55" stop-color="#05060d" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="streak" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="240" fill="url(#sky)"/>
+  <circle cx="1130" cy="168" r="150" fill="url(#sun)"/>
+
+  <g fill="#0a0c1c" opacity="0.95">
+    <polygon points="0,170 0,118 40,118 40,96 78,96 78,128 120,128 120,84 150,84 150,134 210,134 210,108 262,108 262,150 330,150 330,122 380,122 380,170"/>
+    <polygon points="720,170 720,132 770,132 770,100 812,100 812,70 840,70 840,100 880,100 880,140 940,140 940,112 990,112 990,150 1060,150 1060,170"/>
+    <polygon points="1230,170 1230,126 1280,126 1280,90 1330,90 1330,138 1390,138 1390,104 1440,104 1440,146 1500,146 1500,118 1600,118 1600,170"/>
+  </g>
+  <g fill="#ffd166" opacity="0.8">
+    <rect x="52" y="104" width="6" height="8"/><rect x="128" y="94" width="6" height="8"/><rect x="224" y="118" width="6" height="8"/>
+    <rect x="780" y="112" width="6" height="8"/><rect x="822" y="82" width="6" height="8"/><rect x="954" y="124" width="6" height="8"/>
+    <rect x="1292" y="102" width="6" height="8"/><rect x="1352" y="150" width="6" height="8" opacity="0"/><rect x="1404" y="116" width="6" height="8"/>
+  </g>
+
+  <polygon points="0,170 1600,170 1600,240 0,240" fill="#0a0a10"/>
+  <polygon points="560,170 1040,170 1500,240 100,240" fill="url(#road)"/>
+  <g stroke="#ffd166" stroke-width="4" opacity="0.9">
+    <line x1="800" y1="172" x2="800" y2="182"/>
+    <line x1="800" y1="190" x2="800" y2="206"/>
+    <line x1="800" y1="216" x2="800" y2="240"/>
+  </g>
+  <polyline points="560,170 100,240" fill="none" stroke="#ff7a18" stroke-width="3" opacity="0.8"/>
+  <polyline points="1040,170 1500,240" fill="none" stroke="#ff7a18" stroke-width="3" opacity="0.8"/>
+
+  <g stroke-linecap="round">
+    <line x1="1050" y1="60" x2="1500" y2="60" stroke="url(#streak)" stroke-width="3"/>
+    <line x1="1150" y1="88" x2="1600" y2="88" stroke="#4cc9f0" stroke-width="2" opacity="0.7"/>
+    <line x1="900" y1="38" x2="1380" y2="38" stroke="#ff4d6d" stroke-width="2" opacity="0.6"/>
+    <line x1="1250" y1="196" x2="1600" y2="196" stroke="url(#streak)" stroke-width="4"/>
+    <line x1="1100" y1="214" x2="1560" y2="214" stroke="#ffc233" stroke-width="3" opacity="0.8"/>
+    <line x1="1300" y1="150" x2="1600" y2="150" stroke="#4cc9f0" stroke-width="2" opacity="0.6"/>
+  </g>
+
+  <rect width="1600" height="240" fill="url(#fadeLeft)"/>
+</svg>

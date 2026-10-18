@@ -1,0 +1,74 @@
+name: Build and release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    env:
+      GSK_RENDERER: cairo
+      GSETTINGS_BACKEND: memory
+      NO_AT_BRIDGE: "1"
+    steps:
+      - name: Install dependencies
+        run: >
+          pacman -Syu --noconfirm --needed
+          python python-gobject python-pytest gtk4 libadwaita
+          adwaita-icon-theme gsettings-desktop-schemas glib2
+          binutils squashfs-tools curl git xorg-server-xvfb ttf-dejavu
+
+      - uses: actions/checkout@v4
+
+      - name: Test
+        run: xvfb-run -a python -m pytest -q -p no:cacheprovider
+
+      - name: Build AppImage
+        run: xvfb-run -a bash packaging/build-appimage.sh NFSMW-Launcher.AppImage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NFSMW-Launcher
+          path: NFSMW-Launcher.AppImage
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: NFSMW-Launcher
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v1.0.${{ github.run_number }}"
+          previous="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+          {
+            echo "## Changes"
+            echo
+            git log --no-merges --pretty='- %s (%h)' ${previous:+$previous..}HEAD
+          } > notes.md
+          gh release create "$tag" NFSMW-Launcher.AppImage \
+            --title "NFSMW Launcher $tag" \
+            --notes-file notes.md \
+            --target "$GITHUB_SHA"

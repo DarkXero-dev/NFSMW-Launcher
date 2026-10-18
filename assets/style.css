@@ -1,0 +1,71 @@
+@define-color accent_bg_color #f5b301;
+@define-color accent_fg_color #14110a;
+@define-color accent_color #ffc933;
+
+button.gold {
+  background: #f5b301;
+  color: #14110a;
+}
+
+button.gold:hover {
+  background: #ffc933;
+}
+
+switch:checked {
+  background: #f5b301;
+}
+
+headerbar.art-header {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+  box-shadow: none;
+  border: none;
+}
+
+.launch-bar {
+  background: linear-gradient(to top, rgba(0, 0, 0, 1) 86%, rgba(0, 0, 0, 0));
+  padding: 98px 24px 28px 24px;
+}
+
+.launch-bar button {
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 13px 40px;
+  min-width: 220px;
+  border-radius: 4px;
+}
+
+.launch-bar button.settings-button {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.launch-bar button.settings-button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.banner-title {
+  font-size: 30px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 4px;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.banner-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #ffc933;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.banner {
+  border-bottom: 2px solid #f5b301;
+}
+
+.hotkey-button {
+  min-width: 120px;
+  font-weight: 700;
+}
