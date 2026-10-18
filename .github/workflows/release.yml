@@ -83,7 +83,7 @@ jobs:
           {
             echo "## Changes"
             echo
-            git log --no-merges --pretty='- %s (%h)' ${previous:+$previous..}HEAD
+            bash packaging/changelog.sh "${previous:+$previous..}HEAD"
           } > notes.md
           gh release create "$tag" NFSMW-Launcher.AppImage NFSMW-Launcher.AppImage.zsync \
             --title "NFSMW Launcher $tag" \
