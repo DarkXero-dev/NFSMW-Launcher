@@ -122,3 +122,47 @@ def test_launcher_shows_compatible_distro_logos_in_the_bottom_right_corner(tmp_p
     assert (compatible.get_halign(), compatible.get_valign()) == (Gtk.Align.END, Gtk.Align.END)
     buttons = find(window.get_content(), "launch-buttons")
     assert compatible.get_parent() is not buttons.get_parent()
+
+
+def find_css(widget, css):
+    child = widget.get_first_child()
+    while child:
+        if css in child.get_css_classes():
+            return child
+        hit = find_css(child, css)
+        if hit:
+            return hit
+        child = child.get_next_sibling()
+
+
+def test_about_explains_what_redux_means_in_a_rounded_card():
+    content = AboutWindow(None, "1.0.9").get_content()
+    card = find_css(content, "redux-card")
+    assert "card" in card.get_css_classes()
+    texts = labels(card)
+    assert texts[0] == "What is Redux?"
+    assert any("community-made overhaul mod" in t and "2005 PC version" in t for t in texts)
+    assert any("pre-configured compilation pack" in t and "high-definition texture upgrades" in t for t in texts)
+    assert any("look and play like a modern video game remaster" in t for t in texts)
+
+
+def test_about_card_sits_beside_the_logo_column_so_the_window_stays_short():
+    content = AboutWindow(None, "1.0.9").get_content()
+    card = find_css(content, "redux-card")
+    assert card.get_parent().get_orientation() == Gtk.Orientation.HORIZONTAL
+
+
+def test_logo_column_and_redux_card_end_up_exactly_the_same_height():
+    from gi.repository import GLib
+
+    window = AboutWindow(None, "1.0.9")
+    window.present()
+    context = GLib.MainContext.default()
+    for _ in range(60):
+        context.iteration(False)
+    content = window.get_content()
+    identity = find_css(content, "about-identity")
+    card = find_css(content, "redux-card")
+    assert identity.get_valign() == Gtk.Align.FILL and card.get_valign() == Gtk.Align.FILL
+    assert identity.get_height() == card.get_height() > 0
+    assert identity.measure(Gtk.Orientation.VERTICAL, 280)[1] <= identity.get_height()

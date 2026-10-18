@@ -8,6 +8,7 @@ One click starts the game, and a settings window edits all nine of the Redux mod
 
 - **Launch Game** through Bottles, Wine, Proton (umu-run) or your own command.
 - **Redux Settings** with every option from the mod's `.ini` files in one place.
+- **Close to tray**: closing the window asks whether to quit or minimize to the system tray.
 - **Safe edits**: only the values you change are written. A backup is made before the first save.
 
 ## Install
@@ -22,4 +23,3 @@ When a newer release is out, an **Update & Relaunch** button appears in the laun
 
 - **The game is not included.** For legal reasons it is up to you to find and download it yourself.
 - **Primarily built for Arch Linux and derivatives** (CachyOS, EndeavourOS, Manjaro and similar).
-- Distro logos shown in the launcher belong to their respective projects.

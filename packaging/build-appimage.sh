@@ -51,7 +51,7 @@ cp -a "$root/main.py" "$root/nfsmw_launcher" "$app_share/"
 repo="${GITHUB_REPOSITORY:-DarkXero-dev/NFSMW-Launcher}"
 echo "$repo" > "$app_share/REPO"
 mkdir -p "$app_share/assets"
-cp -a "$root/assets/launcher.jpg" "$root/assets/darkxero.png" "$root/assets/github.png" "$root/assets/settings-banner.png" "$root/assets/style.css" "$root/assets/logos" "$app_share/assets/"
+cp -a "$root/assets/launcher.jpg" "$root/assets/darkxero.png" "$root/assets/github.png" "$root/assets/tray.png" "$root/assets/settings-banner.png" "$root/assets/style.css" "$root/assets/logos" "$app_share/assets/"
 find "$app_share" -name __pycache__ -type d -prune -exec rm -rf {} +
 
 echo "Shared libraries (probing a live run for dlopen'd ones)"

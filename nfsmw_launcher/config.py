@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 
 DEFAULT_ENV = "WINEDLLOVERRIDES=dinput8=n,b;d3d9=n,b"
+CLOSE_ACTIONS = ("ask", "quit", "tray")
 
 
 @dataclass
@@ -17,6 +18,7 @@ class Config:
     umu_prefix: str = ""
     custom_command: str = ""
     env: str = DEFAULT_ENV
+    close_action: str = "ask"
 
 
 def config_path() -> Path:
@@ -31,7 +33,10 @@ def load_config(path: Path | None = None) -> Config:
     except (FileNotFoundError, json.JSONDecodeError):
         return Config()
     known = {f.name for f in fields(Config)}
-    return Config(**{k: v for k, v in data.items() if k in known})
+    config = Config(**{k: v for k, v in data.items() if k in known})
+    if config.close_action not in CLOSE_ACTIONS:
+        config.close_action = "ask"
+    return config
 
 
 def save_config(config: Config, path: Path | None = None) -> None:

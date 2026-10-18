@@ -7,8 +7,9 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, GLib, GObject, Gtk
 
-from .config import DEFAULT_ENV, Config
+from .config import CLOSE_ACTIONS, DEFAULT_ENV, Config
 from .layout import TwoColumnPage
+from .tray import TRAY_HELP, tray_available
 from .runners import GAME_EXE, find_bottles_cli, find_game_exe, list_bottles
 
 RUNNERS = [
@@ -113,6 +114,19 @@ class PreferencesWindow(Adw.Window):
         self._custom_group.add(self._custom_command)
         page.add(self._custom_group, column=0)
 
+        closing = Adw.PreferencesGroup(title="Closing the launcher")
+        self._close_row = Adw.ComboRow(
+            title="When closing the window",
+            model=Gtk.StringList.new(["Ask every time", "Quit", "Minimize to tray"]),
+        )
+        self._close_row.set_selected(CLOSE_ACTIONS.index(config.close_action))
+        if not tray_available():
+            note = Gtk.Image(icon_name="dialog-information-symbolic", valign=Gtk.Align.CENTER)
+            note.set_tooltip_text(TRAY_HELP)
+            self._close_row.add_suffix(note)
+        closing.add(self._close_row)
+        page.add(closing, column=1)
+
         env = Adw.PreferencesGroup(
             title="Environment variables",
             description="One KEY=VALUE per line. The default makes Wine load the Redux mod loader.",
@@ -197,6 +211,7 @@ class PreferencesWindow(Adw.Window):
             umu_prefix=self._umu_prefix.get_text().strip(),
             custom_command=self._custom_command.get_text().strip(),
             env=self._env_buffer.get_text(start, end, False),
+            close_action=CLOSE_ACTIONS[self._close_row.get_selected()],
         )
         self.emit("saved", config)
         self.close()

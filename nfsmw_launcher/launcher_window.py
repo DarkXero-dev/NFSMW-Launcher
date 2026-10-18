@@ -10,8 +10,10 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib, Gtk
 
 from .about_window import AboutWindow
+from .close_dialog import CloseDialog
 from .config import Config, load_config, save_config
 from .prefs_window import PreferencesWindow
+from .tray import Tray, close_decision, tray_available
 from .runners import build_launch, find_game_dir, host_env, start, validate
 from .settings_window import ASSETS, ReduxSettingsWindow
 from .updater import Update, check_for_update, download, install, relaunch_argv, update_check_enabled
@@ -33,6 +35,15 @@ class LauncherWindow(Adw.ApplicationWindow):
         self._autodetect_game_dir()
         self._toasts = Adw.ToastOverlay()
         self._update: Update | None = None
+        self._tray = Tray(
+            {
+                "show": self._show_from_tray,
+                "launch": self._launch_from_tray,
+                "settings": self._settings_from_tray,
+                "quit": self._quit,
+            }
+        )
+        self.connect("close-request", self._on_close_request)
         self._build_ui()
         if validate(self._config):
             GLib.idle_add(self._open_preferences)
@@ -157,6 +168,46 @@ class LauncherWindow(Adw.ApplicationWindow):
         self.get_application().quit()
         return False
 
+    def _quit(self):
+        self._tray.hide()
+        self.get_application().quit()
+        return False
+
+    def _on_close_request(self, _window) -> bool:
+        decision = close_decision(self._config.close_action, tray_available())
+        if decision == "ask":
+            self._ask_close()
+            return True
+        if decision == "tray":
+            return self._hide_to_tray()
+        return False
+
+    def _hide_to_tray(self) -> bool:
+        if not self._tray.show():
+            return False
+        self.set_visible(False)
+        return True
+
+    def _ask_close(self):
+        dialog = CloseDialog(self, tray_available(), self._on_close_choice)
+        dialog.present()
+        return dialog
+
+    def _on_close_choice(self, choice: str, remember: bool):
+        if choice == "cancel":
+            return
+        if remember:
+            self._config.close_action = choice
+            save_config(self._config)
+        if choice == "tray" and self._hide_to_tray():
+            return
+        self._quit()
+
+    def _show_from_tray(self):
+        self._tray.hide()
+        self.set_visible(True)
+        self.present()
+
     def _toast(self, message: str):
         self._toasts.add_toast(Adw.Toast(title=message))
 
@@ -171,19 +222,32 @@ class LauncherWindow(Adw.ApplicationWindow):
         save_config(config)
         self._toast("Launcher settings saved")
 
-    def _on_launch(self, _button):
+    def _start_game(self) -> bool:
         problems = validate(self._config)
         if problems:
             self._toast(problems[0])
             self._open_preferences()
-            return
+            return False
         try:
             start(build_launch(self._config))
         except OSError as error:
             self._toast(f"Could not start the game: {error}")
-            return
-        self._toast("Launching...")
-        GLib.timeout_add_seconds(2, self.close)
+            return False
+        return True
+
+    def _on_launch(self, _button):
+        if self._start_game():
+            self._toast("Launching...")
+            GLib.timeout_add_seconds(2, self._quit)
+
+    def _launch_from_tray(self):
+        if validate(self._config):
+            self._show_from_tray()
+        self._start_game()
+
+    def _settings_from_tray(self):
+        self._show_from_tray()
+        self._on_redux_settings(None)
 
     def _on_redux_settings(self, _button):
         scripts_dir = Path(self._config.game_dir) / "scripts"

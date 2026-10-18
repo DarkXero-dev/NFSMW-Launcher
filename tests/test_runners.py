@@ -190,3 +190,16 @@ def test_find_game_dir_returns_first_candidate_with_exe(tmp_path):
 
 def test_find_game_dir_none_when_no_candidate_matches(tmp_path):
     assert find_game_dir([tmp_path, tmp_path / "missing"]) is None
+
+
+def test_close_action_defaults_to_ask_and_roundtrips(tmp_path):
+    assert Config().close_action == "ask"
+    path = tmp_path / "c.json"
+    save_config(Config(close_action="tray"), path)
+    assert load_config(path).close_action == "tray"
+
+
+def test_invalid_close_action_in_config_falls_back_to_ask(tmp_path):
+    path = tmp_path / "c.json"
+    path.write_text('{"close_action": "explode"}')
+    assert load_config(path).close_action == "ask"

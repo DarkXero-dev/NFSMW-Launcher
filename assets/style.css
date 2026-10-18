@@ -87,3 +87,27 @@ headerbar.art-header {
   opacity: 1;
   -gtk-icon-transform: scale(1.35);
 }
+
+.redux-card {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.redux-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffc933;
+}
+
+.redux-card-text,
+.redux-purpose {
+  line-height: 1.05;
+}
+
+.redux-purpose {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.72);
+}
