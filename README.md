@@ -13,9 +13,8 @@ One click starts the game, and a settings window edits all nine of the Redux mod
 ## Install
 
 1. Download `NFSMW-Launcher.AppImage` from the [latest release](../../releases/latest).
-2. Put it in your game folder, next to `speed.exe`.
-3. Make it executable (`chmod +x NFSMW-Launcher.AppImage`) and run it.
-4. On first run, click the cog (top right) and choose how to run the game. The game folder is picked up automatically.
+2. Make it executable (`chmod +x NFSMW-Launcher.AppImage`) and run it.
+3. On first run, click the cog (top right) and choose how to run the game. The game folder is picked up automatically.
 
 When a newer release is out, an **Update & Relaunch** button appears in the launcher. It downloads the new AppImage, checks it, replaces itself and restarts.
 
@@ -23,3 +22,4 @@ When a newer release is out, an **Update & Relaunch** button appears in the laun
 
 - **The game is not included.** For legal reasons it is up to you to find and download it yourself.
 - **Primarily built for Arch Linux and derivatives** (CachyOS, EndeavourOS, Manjaro and similar).
+- Distro logos shown in the launcher belong to their respective projects.

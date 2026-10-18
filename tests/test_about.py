@@ -84,3 +84,41 @@ def test_update_button_is_hidden_until_an_update_is_found(tmp_path, monkeypatch)
     window._on_update_found(Update("1.0.99", "https://example.test/x", None))
     assert window._update_button.get_visible()
     assert "1.0.99" in window._update_button.get_tooltip_text()
+
+
+def test_launcher_shows_compatible_distro_logos_in_the_bottom_right_corner(tmp_path, monkeypatch):
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    from nfsmw_launcher.launcher_window import LOGOS, LauncherWindow
+    from nfsmw_launcher.settings_window import ASSETS
+
+    assert [name for name, _ in LOGOS] == ["Arch Linux", "XeroLinux", "CachyOS", "EndeavourOS"]
+    assert all((ASSETS / "logos" / file).is_file() for _, file in LOGOS)
+
+    window = LauncherWindow(Adw.Application(application_id="org.nfsmw.ReduxLauncherTest2"))
+
+    def find(widget, css):
+        child = widget.get_first_child()
+        while child:
+            if css in child.get_css_classes():
+                return child
+            hit = find(child, css)
+            if hit:
+                return hit
+            child = child.get_next_sibling()
+
+    logos = find(window.get_content(), "distro-logos")
+    tooltips = []
+    image = logos.get_first_child()
+    while image:
+        tooltips.append(image.get_tooltip_text())
+        image = image.get_next_sibling()
+    assert tooltips == ["Arch Linux", "XeroLinux", "CachyOS", "EndeavourOS"]
+
+    compatible = logos.get_parent()
+    label = compatible.get_first_child()
+    assert label.get_label() == "Compatible with:"
+    assert label.get_next_sibling() is logos
+
+    assert (compatible.get_halign(), compatible.get_valign()) == (Gtk.Align.END, Gtk.Align.END)
+    buttons = find(window.get_content(), "launch-buttons")
+    assert compatible.get_parent() is not buttons.get_parent()

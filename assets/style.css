@@ -23,7 +23,7 @@ headerbar.art-header {
 
 .launch-bar {
   background: linear-gradient(to top, rgba(0, 0, 0, 1) 86%, rgba(0, 0, 0, 0));
-  padding: 98px 24px 28px 24px;
+  padding: 75px 24px 51px 24px;
 }
 
 .launch-bar button {
@@ -68,4 +68,22 @@ headerbar.art-header {
 .hotkey-button {
   min-width: 120px;
   font-weight: 700;
+}
+
+.compatible-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.distro-logos image {
+  padding: 3px;
+  opacity: 0.7;
+  transition: opacity 150ms ease, -gtk-icon-transform 150ms ease;
+}
+
+.distro-logos image:hover {
+  opacity: 1;
+  -gtk-icon-transform: scale(1.35);
 }

@@ -7,7 +7,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, GLib, Gtk
+from gi.repository import Adw, Gio, GLib, Gtk
 
 from .about_window import AboutWindow
 from .config import Config, load_config, save_config
@@ -16,6 +16,14 @@ from .runners import build_launch, find_game_dir, host_env, start, validate
 from .settings_window import ASSETS, ReduxSettingsWindow
 from .updater import Update, check_for_update, download, install, relaunch_argv, update_check_enabled
 from .version import REPO, VERSION
+
+
+LOGOS = [
+    ("Arch Linux", "archlinux.png"),
+    ("XeroLinux", "xerolinux.png"),
+    ("CachyOS", "cachyos.png"),
+    ("EndeavourOS", "endeavouros.png"),
+]
 
 
 class LauncherWindow(Adw.ApplicationWindow):
@@ -64,16 +72,38 @@ class LauncherWindow(Adw.ApplicationWindow):
         launch.connect("clicked", self._on_launch)
         settings = Gtk.Button(label="REDUX SETTINGS", css_classes=["settings-button"])
         settings.connect("clicked", self._on_redux_settings)
-        bar = Gtk.Box(
-            spacing=16, halign=Gtk.Align.FILL, valign=Gtk.Align.END, css_classes=["launch-bar"]
+        buttons = Gtk.Box(spacing=16, halign=Gtk.Align.CENTER, css_classes=["launch-buttons"])
+        buttons.append(launch)
+        buttons.append(settings)
+
+        logos = Gtk.Box(spacing=4, css_classes=["distro-logos"])
+        for name, file in LOGOS:
+            icon = Gio.FileIcon.new(Gio.File.new_for_path(str(ASSETS / "logos" / file)))
+            logo = Gtk.Image.new_from_gicon(icon)
+            logo.set_pixel_size(16)
+            logo.set_tooltip_text(name)
+            logos.append(logo)
+
+        compatible = Gtk.Box(
+            spacing=6,
+            halign=Gtk.Align.END,
+            valign=Gtk.Align.END,
+            margin_end=14,
+            margin_bottom=10,
         )
-        bar.append(Gtk.Box(hexpand=True))
-        bar.append(launch)
-        bar.append(settings)
-        bar.append(Gtk.Box(hexpand=True))
+        compatible.append(Gtk.Label(label="Compatible with:", css_classes=["compatible-label"]))
+        compatible.append(logos)
+
+        bar = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            valign=Gtk.Align.END,
+            css_classes=["launch-bar"],
+        )
+        bar.append(buttons)
 
         overlay = Gtk.Overlay(child=art)
         overlay.add_overlay(bar)
+        overlay.add_overlay(compatible)
         overlay.add_overlay(header)
         self._toasts.set_child(overlay)
         self.set_content(self._toasts)
